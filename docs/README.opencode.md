@@ -1,24 +1,24 @@
-# Superpowers for OpenCode
+# Superplex for OpenCode
 
-Complete guide for using Superpowers with [OpenCode.ai](https://opencode.ai).
+Complete guide for using Superplex with [OpenCode.ai](https://opencode.ai).
 
 ## Installation
 
-Add superpowers to the `plugin` array in your `opencode.json` (global or project-level):
+Add superplex to the `plugin` array in your `opencode.json` (global or project-level):
 
 ```json
 {
-  "plugin": ["superpowers@git+https://github.com/obra/superpowers.git"]
+  "plugin": ["superplex@git+https://github.com/TVB-Apps-LLC/superplex.git"]
 }
 ```
 
 Restart OpenCode. The plugin installs through OpenCode's plugin manager and
 registers all skills.
 
-Verify by asking: "Tell me about your superpowers"
+Verify by asking: "Tell me about your superplex"
 
 OpenCode uses its own plugin install. If you also use Claude Code, Codex, or
-another harness, install Superpowers separately for each one.
+another harness, install Superplex separately for each one.
 
 ### Migrating from the old symlink-based install
 
@@ -78,20 +78,20 @@ description: Use when [condition] - [what it does]
 
 Create project-specific skills in `.opencode/skills/` within your project.
 
-**Skill Priority:** Project skills > Personal skills > Superpowers skills
+**Skill Priority:** Project skills > Personal skills > Superplex skills
 
 ## Updating
 
-OpenCode installs Superpowers through a git-backed package spec. Some OpenCode
+OpenCode installs Superplex through a git-backed package spec. Some OpenCode
 and Bun versions pin that resolved git dependency in a lockfile or cache, so a
-restart may not pick up the newest Superpowers commit. If updates do not appear,
+restart may not pick up the newest Superplex commit. If updates do not appear,
 clear OpenCode's package cache or reinstall the plugin.
 
 To pin a specific version, use a branch or tag:
 
 ```json
 {
-  "plugin": ["superpowers@git+https://github.com/obra/superpowers.git#v5.0.3"]
+  "plugin": ["superplex@git+https://github.com/TVB-Apps-LLC/superplex.git#v5.0.3"]
 }
 ```
 
@@ -99,8 +99,8 @@ To pin a specific version, use a branch or tag:
 
 The plugin does two things:
 
-1. **Injects bootstrap context** via the `experimental.chat.messages.transform` hook, adding superpowers awareness to every conversation.
-2. **Registers the skills directory** via the `config` hook, so OpenCode discovers all superpowers skills without symlinks or manual config.
+1. **Injects bootstrap context** via the `experimental.chat.messages.transform` hook, adding superplex awareness to every conversation.
+2. **Registers the skills directory** via the `config` hook, so OpenCode discovers all superplex skills without symlinks or manual config.
 
 ### Tool Mapping
 
@@ -121,7 +121,7 @@ Skills speak in actions rather than naming any one runtime's tools. On OpenCode 
 
 ### Plugin not loading
 
-1. Check OpenCode logs: `opencode run --print-logs "hello" 2>&1 | grep -i superpowers`
+1. Check OpenCode logs: `opencode run --print-logs "hello" 2>&1 | grep -i superplex`
 2. Verify the plugin line in your `opencode.json` is correct
 3. Make sure you're running a recent version of OpenCode
 
@@ -134,14 +134,14 @@ the plugin, try installing with system npm and pointing OpenCode at the local
 package:
 
 ```powershell
-npm install superpowers@git+https://github.com/obra/superpowers.git --prefix "$HOME\.config\opencode"
+npm install superplex@git+https://github.com/TVB-Apps-LLC/superplex.git --prefix "$HOME\.config\opencode"
 ```
 
 Then use the installed package path in `opencode.json`:
 
 ```json
 {
-  "plugin": ["~/.config/opencode/node_modules/superpowers"]
+  "plugin": ["~/.config/opencode/node_modules/superplex"]
 }
 ```
 
@@ -158,6 +158,6 @@ Then use the installed package path in `opencode.json`:
 
 ## Getting Help
 
-- Report issues: https://github.com/obra/superpowers/issues
-- Main documentation: https://github.com/obra/superpowers
+- Report issues: https://github.com/TVB-Apps-LLC/superplex/issues
+- Main documentation: https://github.com/TVB-Apps-LLC/superplex
 - OpenCode docs: https://opencode.ai/docs/

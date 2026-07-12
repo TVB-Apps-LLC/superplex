@@ -1,6 +1,6 @@
 {
-  "name": "superpowers",
-  "description": "Core skills library: TDD, debugging, collaboration patterns, and proven techniques",
+  "name": "superplex",
+  "description": "Core skills library: TDD, debugging, collaboration patterns, and proven techniques (fork of Superpowers)",
   "version": "6.1.1",
   "contextFileName": "GEMINI.md"
 }

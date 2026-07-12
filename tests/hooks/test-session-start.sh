@@ -186,12 +186,12 @@ assert_command_output \
     bash "$HOOK_UNDER_TEST"
 
 legacy_home="$(make_home legacy-warning-removed)"
-mkdir -p "$legacy_home/.config/superpowers/skills"
+mkdir -p "$legacy_home/.config/superplex/skills"
 assert_command_output \
     "SessionStart omits obsolete legacy custom-skill warning" \
     "nested" \
     "" \
-    "Superpowers now uses"$'\037'"~/.config/superpowers/skills"$'\037'"~/.claude/skills"$'\037'"legacy" \
+    "Superplex now uses"$'\037'"~/.config/superplex/skills"$'\037'"~/.claude/skills"$'\037'"legacy" \
     "$legacy_home" \
     CLAUDE_PLUGIN_ROOT="$REPO_ROOT" \
     bash "$HOOK_UNDER_TEST"

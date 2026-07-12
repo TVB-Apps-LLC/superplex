@@ -1,19 +1,17 @@
 {
-  "name": "superpowers-dev",
-  "description": "Development marketplace for Superpowers core skills library",
+  "name": "superplex-dev",
+  "description": "Development marketplace for Superplex core skills library (fork of Superpowers)",
   "owner": {
-    "name": "Jesse Vincent",
-    "email": "jesse@fsck.com"
+    "name": "TVB Apps LLC"
   },
   "plugins": [
     {
-      "name": "superpowers",
-      "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques",
+      "name": "superplex",
+      "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques (fork of Superpowers)",
       "version": "6.1.1",
       "source": "./",
       "author": {
-        "name": "Jesse Vincent",
-        "email": "jesse@fsck.com"
+        "name": "TVB Apps LLC"
       }
     }
   ]

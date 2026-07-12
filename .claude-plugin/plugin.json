@@ -1,13 +1,12 @@
 {
-  "name": "superpowers",
-  "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques",
+  "name": "superplex",
+  "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques (fork of Superpowers)",
   "version": "6.1.1",
   "author": {
-    "name": "Jesse Vincent",
-    "email": "jesse@fsck.com"
+    "name": "TVB Apps LLC"
   },
-  "homepage": "https://github.com/obra/superpowers",
-  "repository": "https://github.com/obra/superpowers",
+  "homepage": "https://github.com/TVB-Apps-LLC/superplex",
+  "repository": "https://github.com/TVB-Apps-LLC/superplex",
   "license": "MIT",
   "keywords": [
     "skills",

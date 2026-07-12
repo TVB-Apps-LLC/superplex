@@ -1,11 +1,11 @@
 {
-  "name": "superpowers-dev",
+  "name": "superplex-dev",
   "interface": {
-    "displayName": "Superpowers Dev"
+    "displayName": "Superplex Dev"
   },
   "plugins": [
     {
-      "name": "superpowers",
+      "name": "superplex",
       "source": {
         "source": "url",
         "url": "./"
