@@ -28,9 +28,20 @@ Subagent (general-purpose):
     ## Diff
 
     Review the complete range [BASE_SHA]..[HEAD_SHA], including all commits
-    in this PR. Use a generated review package when available. Your review is
-    read-only: do not mutate the working tree, index, HEAD, branch, PR, or
-    remote comments.
+    in this PR. Use a generated review package when available. Inspect the
+    range explicitly with `git diff --stat [BASE_SHA]..[HEAD_SHA]` and
+    `git diff [BASE_SHA]..[HEAD_SHA]` when a package is not supplied.
+
+    Your review is read-only: do not mutate the working tree, index, HEAD,
+    branch, PR, or remote comments. Use `git show`, `git diff`, and `git log`
+    to inspect history. If a different revision genuinely needs a working
+    copy, use a separate temporary worktree; never move HEAD in the checkout
+    being reviewed.
+
+    Treat implementer reports, verification summaries, and stated design
+    rationales as evidence to verify, not authority. A claim that something
+    was intentionally kept simple does not downgrade a real correctness,
+    compatibility, or maintainability issue.
 
     ## Review Order
 
@@ -43,9 +54,16 @@ Subagent (general-purpose):
        criteria. Flag untested behavior, weak assertions, missing failure
        cases, or verification claims not supported by output.
 
+    Also consider type safety, API compatibility, migrations and rollback,
+    documentation, authorization/security, production readiness, and whether
+    the PR's stated non-goals were respected. Inspect code outside the diff
+    only for a concrete named risk; name both the risk and what you checked.
+
     Do not broaden into a repository-wide audit without naming the concrete
     risk that requires it. Do not rerun tests already reported for unchanged
-    code; run a focused check only when the diff raises a specific doubt.
+    code; run a focused check only when the diff raises a specific doubt. If
+    heavy validation would be useful but is not necessary to establish the
+    finding, recommend it instead of running it.
 
     ## Output
 
@@ -68,6 +86,10 @@ Subagent (general-purpose):
 
     For every issue include file:line, what is wrong, why it matters, and how
     to fix it when the fix is not obvious.
+
+    ### Recommendations
+    [Non-blocking improvements for architecture, quality, process, or future
+    coverage. Do not use this section to hide a Critical or Important issue.]
 
     ### Assessment
     **Ready for PR feedback loop:** [Yes | No]

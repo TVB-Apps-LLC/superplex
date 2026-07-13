@@ -9,14 +9,18 @@ Load the implementation and test plans, review them critically, and execute the 
 
 **Announce at start:** "I'm using the executing-plans skill to implement this PR-oriented plan."
 
+If subagents are available, use `superplex:subagent-driven-development` for the same PR map. It provides isolated implementation context and a durable controller ledger; this skill remains the separate-session fallback.
+
 ## Process
 
 ### Step 1: Load and Review Plans
 
 1. Read the implementation plan, test plan, approved spec, and repository instructions.
-2. Review the PR map for missing prerequisites, broken intermediate states, contradictory constraints, missing test ownership, or missing spec/plan links.
+2. Review the PR map for missing prerequisites, broken intermediate states, contradictory constraints, missing test ownership, missing spec/plan links, and requirements that are not owned by a PR.
 3. If concerns block execution, raise them before starting.
-4. If the plan is sound, create progress entries for every PR and its tasks.
+4. If the plan is sound, create progress entries for every PR and its tasks. Mark tasks in progress before work, follow the documented steps exactly, run their specified verification, and mark them complete only with evidence.
+
+Return to this plan review when the user updates the plan, a prerequisite changes, a migration/contract invalidates the assumed order, or the approach must be reconsidered. Do not force execution through a plan defect.
 
 ### Step 2: Execute One PR at a Time
 
@@ -41,7 +45,9 @@ Only after the final PR and all post-merge validation pass, record task completi
 
 ## When to Stop
 
-Stop immediately when a required check fails, a plan prerequisite is missing, a review comment is ambiguous, a required GitHub permission is unavailable, or a cloud secret/variable must be provisioned. Record the blocker and ask for direction rather than guessing.
+Stop immediately when a required check fails, verification fails repeatedly, an instruction or review comment is ambiguous, a plan prerequisite is missing, a required GitHub permission is unavailable, or a cloud secret/variable must be provisioned. Record the blocker and ask for direction rather than guessing.
+
+Never begin implementation on `main` or another protected default branch without explicit authorization. Use the plan's branch/worktree instructions and preserve the workspace until the complete task is validated.
 
 ## Integration
 
