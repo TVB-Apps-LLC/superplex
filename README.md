@@ -117,15 +117,15 @@ The Pi package loads the Superplex skills and a small extension that injects the
 
 2. **using-git-worktrees** - Activates after design approval. Creates isolated workspace on new branch, runs project setup, verifies clean test baseline.
 
-3. **writing-plans** - Activates with approved design. Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
+3. **writing-plans** - Activates with approved design. Builds a dependency-ordered PR map, optionally writes a separate test plan, and breaks each PR into bite-sized tasks with exact file paths and verification steps.
 
-4. **subagent-driven-development** or **executing-plans** - Activates with plan. Dispatches fresh subagent per task with two-stage review (spec compliance, then code quality), or executes in batches with human checkpoints.
+4. **subagent-driven-development** or **executing-plans** - Activates with plan. Executes one PR at a time with focused implementer subagents, then reviews the complete PR before moving to dependent work.
 
-5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit. Deletes code written before tests.
+5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit. Review fixes must rerun their covering tests.
 
-6. **requesting-code-review** - Activates between tasks. Reviews against plan, reports issues by severity. Critical issues block progress.
+6. **requesting-code-review** - Activates after each PR. Reviews the full PR for spec compliance, code quality, and test coverage.
 
-7. **finishing-a-development-branch** - Activates when tasks complete. Verifies tests, presents options (merge/PR/keep/discard), cleans up worktree.
+7. **receiving-code-review** and **finishing-a-development-branch** - Process PR feedback, monitor reviews/reactions/checks, resolve threads, and squash-merge when the PR gate passes.
 
 **The agent checks for relevant skills before any task.** Mandatory workflows, not suggestions.
 
@@ -149,7 +149,7 @@ The Pi package loads the Superplex skills and a small extension that injects the
 - **receiving-code-review** - Responding to feedback
 - **using-git-worktrees** - Parallel development branches
 - **finishing-a-development-branch** - Merge/PR decision workflow
-- **subagent-driven-development** - Fast iteration with two-stage review (spec compliance, then code quality)
+- **subagent-driven-development** - PR-oriented execution with focused implementer subagents, one whole-PR review, and a persistent feedback loop
 
 **Meta**
 - **writing-skills** - Create new skills following best practices (includes testing methodology)

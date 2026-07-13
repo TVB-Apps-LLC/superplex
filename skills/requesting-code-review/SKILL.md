@@ -1,103 +1,50 @@
 ---
 name: requesting-code-review
-description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements
+description: Use when a pull request is ready for review, after completing a PR-sized change, or before merging
 ---
 
-# Requesting Code Review
+# Requesting Pull Request Review
 
-Dispatch a code reviewer subagent to catch issues before they cascade. The reviewer gets precisely crafted context for evaluation — never your session's history. This keeps the reviewer focused on the work product, not your thought process, and preserves your own context for continued work.
-
-**Core principle:** Review early, review often.
+Request one whole-PR review covering spec compliance, code quality, and test coverage. A PR may contain multiple implementation tasks; task completion is not a review gate.
 
 ## When to Request Review
 
-**Mandatory:**
-- After each task in subagent-driven development
-- After completing major feature
-- Before merge to main
+Request review:
 
-**Optional but valuable:**
-- When stuck (fresh perspective)
-- Before refactoring (baseline check)
-- After fixing complex bug
+- After all tasks assigned to the current PR are complete.
+- After the PR-specific verification matrix passes.
+- After opening or updating the PR with durable links to the spec, implementation plan, and test plan.
+- Again after any fix push, using the receiving-code-review loop.
 
-## How to Request
+Do not request a merge-readiness verdict for an unfinished task or a partial PR.
 
-**1. Get git SHAs:**
-```bash
-BASE_SHA=$(git rev-parse HEAD~1)  # or origin/main
-HEAD_SHA=$(git rev-parse HEAD)
-```
+## Required Reviewer Context
 
-**2. Dispatch code reviewer subagent:**
+Dispatch a reviewer subagent with:
 
-Dispatch a `general-purpose` subagent, filling the template at [code-reviewer.md](code-reviewer.md)
+- Repository and PR URL/number.
+- Base and head revisions.
+- Approved spec path.
+- Implementation-plan path.
+- Test-plan path, or the documented reason there is none.
+- The current PR entry, acceptance criteria, non-goals, and prerequisites.
+- Verification commands and their fresh results.
 
-**Placeholders:**
-- `{DESCRIPTION}` - Brief summary of what you built
-- `{PLAN_OR_REQUIREMENTS}` - What it should do
-- `{BASE_SHA}` - Starting commit
-- `{HEAD_SHA}` - Ending commit
+Use the template at `code-reviewer.md`. Select the least expensive model capable of the review; use a frontier model for subtle architecture, security, concurrency, or broad integration risks. Always specify the model explicitly.
 
-**3. Act on feedback:**
-- Fix Critical issues immediately
-- Fix Important issues before proceeding
-- Note Minor issues for later
-- Push back if reviewer is wrong (with reasoning)
+## Required Verdicts
 
-## Example
+The reviewer must return separate verdicts for:
 
-```
-[Just completed Task 2: Add verification function]
+1. Spec compliance.
+2. Code quality and maintainability.
+3. Test coverage and verification evidence.
 
-You: Let me request code review before proceeding.
+Each finding is Critical, Important, or Minor and includes file/line evidence, impact, and a suggested fix where useful. The reviewer must state either **Ready for PR feedback loop** or **Not ready**.
 
-BASE_SHA=$(git log --oneline | grep "Task 1" | head -1 | awk '{print $1}')
-HEAD_SHA=$(git rev-parse HEAD)
+## After Review
 
-[Dispatch code reviewer subagent]
-  DESCRIPTION: Added verifyIndex() and repairIndex() with 4 issue types
-  PLAN_OR_REQUIREMENTS: Task 2 from docs/superplex/plans/deployment-plan.md
-  BASE_SHA: a7981ec
-  HEAD_SHA: 3df7661
-
-[Subagent returns]:
-  Strengths: Clean architecture, real tests
-  Issues:
-    Important: Missing progress indicators
-    Minor: Magic number (100) for reporting interval
-  Assessment: Ready to proceed
-
-You: [Fix progress indicators]
-[Continue to Task 3]
-```
-
-## Integration with Workflows
-
-**Subagent-Driven Development:**
-- Review after EACH task
-- Catch issues before they compound
-- Fix before moving to next task
-
-**Executing Plans:**
-- Review after each task or at natural checkpoints
-- Get feedback, apply, continue
-
-**Ad-Hoc Development:**
-- Review before merge
-- Review when stuck
-
-## Red Flags
-
-**Never:**
-- Skip review because "it's simple"
-- Ignore Critical issues
-- Proceed with unfixed Important issues
-- Argue with valid technical feedback
-
-**If reviewer wrong:**
-- Push back with technical reasoning
-- Show code/tests that prove it works
-- Request clarification
-
-See template at: [code-reviewer.md](code-reviewer.md)
+- Critical and Important findings block the PR feedback loop until addressed.
+- Minor findings are recorded in the PR ledger and carried into the next review if they remain relevant.
+- Dispatch or continue the persistent PR feedback subagent from `../receiving-code-review/pr-feedback-agent.md` to process GitHub comments, implement valid fixes, answer invalid feedback, resolve addressed threads, and monitor the PR until the merge gate is satisfied.
+- Do not claim the PR is ready based solely on the reviewer report; verify the remote PR state, checks, reactions, reviews, and threads.

@@ -1,174 +1,165 @@
 ---
 name: writing-plans
-description: Use when you have a spec or requirements for a multi-step task, before touching code
+description: Use when you have an approved spec or requirements for a multi-step task, before touching code
 ---
 
 # Writing Plans
 
-## Overview
+Write a decision-complete implementation plan. Organize work into dependency-ordered pull requests that are independently understandable, testable, reviewable, and mergeable.
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+**Announce at start:** "I'm using the writing-plans skill to create the implementation and test plans."
 
-Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
+## Required Order
 
-**Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
+1. Read the approved spec completely. Extract requirements, user flows, affected boundaries, dependencies, constraints, and non-goals.
+2. Explore the repository. Confirm real file paths, existing interfaces, test runners, CI checks, fixtures, and conventions.
+3. Think through the work as a dependency graph. Identify foundational contracts, producers, consumers, integration points, operational work, and end-to-end flows.
+4. Create a PR map before writing task details. Use sequential PRs by default; use stacked PRs only when the repository explicitly supports them.
+5. Decide whether the change is non-trivial enough to require a separate test plan. When it is, write the companion test plan before finalizing implementation tasks.
+6. Break each PR into bite-sized implementation tasks. Multiple tasks may belong to one PR. Tasks are execution units, not review gates.
+7. Self-review the plan against the spec, dependency order, test plan, PR boundaries, and repository rules.
 
-**Context:** If working in an isolated worktree, it should have been created via the `superplex:using-git-worktrees` skill at execution time.
+## PR Decomposition
 
-**Save plans to:** `docs/superplex/plans/YYYY-MM-DD-<feature-name>.md`
-- (User preferences for plan location override this default)
+For every candidate PR, ask:
 
-## Scope Check
+- Can a reviewer understand the PR without reading unrelated future work?
+- Does it leave the repository in a working, testable state?
+- Does it establish or consume a stable interface rather than reaching across unfinished work?
+- Is the review surface cohesive enough to receive one code-quality and spec-compliance verdict?
+- Are its tests sufficient to prove its own behavior?
+- What is deliberately excluded from this PR?
 
-If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
+Prefer the smallest coherent slices that preserve working behavior. Common ordering is foundational contracts or pure logic → persistence and authorization → API/service behavior → UI or operational integration → E2E, documentation, and release validation. Adapt this to the actual dependency graph; never split solely by layer when that would create a broken intermediate state.
 
-## File Structure
+## Plan Documents
 
-Before defining tasks, map out which files will be created or modified and what each one is responsible for. This is where decomposition decisions get locked in.
+Save the implementation plan to:
 
-- Design units with clear boundaries and well-defined interfaces. Each file should have one clear responsibility.
-- You reason best about code you can hold in context at once, and your edits are more reliable when files are focused. Prefer smaller, focused files over large ones that do too much.
-- Files that change together should live together. Split by responsibility, not by technical layer.
-- In existing codebases, follow established patterns. If the codebase uses large files, don't unilaterally restructure - but if a file you're modifying has grown unwieldy, including a split in the plan is reasonable.
+```text
+docs/superplex/plans/YYYY-MM-DD-<feature-name>.md
+```
 
-This structure informs the task decomposition. Each task should produce self-contained changes that make sense independently.
+For non-trivial work, also save:
 
-## Task Right-Sizing
+```text
+docs/superplex/plans/YYYY-MM-DD-<feature-name>-test-plan.md
+```
 
-A task is the smallest unit that carries its own test cycle and is worth a
-fresh reviewer's gate. When drawing task boundaries: fold setup,
-configuration, scaffolding, and documentation steps into the task whose
-deliverable needs them; split only where a reviewer could meaningfully
-reject one task while approving its neighbor. Each task ends with an
-independently testable deliverable.
+The implementation plan must link to the approved spec and companion test plan when present. The test plan must link back to the implementation plan.
 
-## Bite-Sized Task Granularity
+## Implementation Plan Header
 
-**Each step is one action (2-5 minutes):**
-- "Write the failing test" - step
-- "Run it to make sure it fails" - step
-- "Implement the minimal code to make the test pass" - step
-- "Run the tests and make sure they pass" - step
-- "Commit" - step
-
-## Plan Document Header
-
-**Every plan MUST start with this header:**
+Every implementation plan starts with:
 
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superplex:subagent-driven-development (recommended) or superplex:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superplex:subagent-driven-development (recommended) or superplex:executing-plans. Work is reviewed and merged by pull request, not by individual task.
 
-**Goal:** [One sentence describing what this builds]
+**Goal:** [one sentence]
 
-**Architecture:** [2-3 sentences about approach]
+**Spec:** [exact path]
 
-**Tech Stack:** [Key technologies/libraries]
+**Test plan:** [exact path, or `Not required — rationale: ...`]
+
+**Architecture:** [2–3 sentences]
+
+**Tech Stack:** [key technologies]
 
 ## Global Constraints
 
-[The spec's project-wide requirements — version floors, dependency limits,
-naming and copy rules, platform requirements — one line each, with exact
-values copied verbatim from the spec. Every task's requirements implicitly
-include this section.]
+[Exact requirements that bind every PR]
 
----
+## PR Map
+
+[Dependency-ordered PR table or graph]
 ```
 
-## Task Structure
+## PR Entry
 
-````markdown
-### Task N: [Component Name]
+Each PR entry must include all of the following:
+
+```markdown
+### PR 1: [Title]
+
+**Purpose:** [user-visible or architectural outcome]
+**Prerequisites:** None | PR N
+**Target:** [base branch] ← [feature branch]
+**Spec:** [exact path]
+**Implementation plan:** [exact path]
+**Test plan:** [exact path]
+**Owned paths:** [files/modules]
+**Produces:** [interfaces or contracts later PRs may consume]
+**Verification:** [exact commands and expected results]
+**Non-goals:** [explicit exclusions]
+**Risks and rollback:** [migration, compatibility, deployment, and rollback notes]
+
+#### Tasks
+
+[Task 1, Task 2, ... using the task format below]
+```
+
+Every PR must be independently testable before it is opened. The PR body must repeat the spec, implementation-plan, and test-plan paths so later reviewers have durable context.
+
+## Test Plan
+
+Create a separate test plan when the feature has multiple user flows, meaningful integration risk, database or authorization behavior, deferred E2E work, or more than one PR. Keep simple one-PR changes inline only when the coverage reasoning is genuinely short.
+
+The test plan must contain:
+
+- Requirement-to-test traceability.
+- Unit and component cases.
+- Integration, API, contract, and database cases.
+- Error, authorization, migration, rollback, and compatibility cases where relevant.
+- E2E flows, fixtures, seed data, and environment requirements.
+- Exact commands and expected verification artifacts.
+- Known gaps, deferred cases, and the PR that owns each gap.
+- A final matrix mapping every acceptance criterion and test case to its owning PR.
+
+For Fourplex, use `tests/manifest/` as the test-case source of truth. Add cases there, validate with `pnpm test:cases:validate`, and regenerate `Docs/test-cases/` with the repository command; never hand-edit generated test-case Markdown. Earlier PRs should cover behavior with unit, integration, database, or contract tests. A final E2E PR may convert manifest cases from `not-yet-automated` to `automated`, add Playwright specs and Allure IDs, and regenerate the rendered documentation.
+
+## Task Format
+
+Tasks are implementation steps inside a PR. Each task must be independently understandable and testable:
+
+```markdown
+#### Task 1: [Component]
 
 **Files:**
-- Create: `exact/path/to/file.py`
-- Modify: `exact/path/to/existing.py:123-145`
-- Test: `tests/exact/path/to/test.py`
+- Create: `exact/path`
+- Modify: `exact/path:line`
+- Test: `exact/path`
 
-**Interfaces:**
-- Consumes: [what this task uses from earlier tasks — exact signatures]
-- Produces: [what later tasks rely on — exact function names, parameter
-  and return types. A task's implementer sees only their own task; this
-  block is how they learn the names and types neighboring tasks use.]
+**Consumes:** [earlier PR contract or existing interface]
+**Produces:** [interface used by later tasks or PRs]
 
 - [ ] **Step 1: Write the failing test**
-
-```python
-def test_specific_behavior():
-    result = function(input)
-    assert result == expected
+- [ ] **Step 2: Run it and verify the expected failure**
+- [ ] **Step 3: Implement the minimum behavior**
+- [ ] **Step 4: Run the focused and required PR verification**
+- [ ] **Step 5: Commit with a clear message**
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
-
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: FAIL with "function not defined"
-
-- [ ] **Step 3: Write minimal implementation**
-
-```python
-def function(input):
-    return expected
-```
-
-- [ ] **Step 4: Run test to verify it passes**
-
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: PASS
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add tests/path/test.py src/path/file.py
-git commit -m "feat: add specific feature"
-```
-````
-
-## No Placeholders
-
-Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
-- "TBD", "TODO", "implement later", "fill in details"
-- "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without actual test code)
-- "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
-- Steps that describe what to do without showing how (code blocks required for code steps)
-- References to types, functions, or methods not defined in any task
-
-## Remember
-- Exact file paths always
-- Complete code in every step — if a step changes code, show the code
-- Exact commands with expected output
-- DRY, YAGNI, TDD, frequent commits
+Do not use placeholders such as `TBD`, `TODO`, "add appropriate validation," or "write tests for the above." Include exact files, interfaces, commands, and expected outcomes.
 
 ## Self-Review
 
-After writing the complete plan, look at the spec with fresh eyes and check the plan against it. This is a checklist you run yourself — not a subagent dispatch.
+Before handing off the plan:
 
-**1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
+1. Map every spec requirement to a PR and verification artifact.
+2. Confirm PR prerequisites form a valid dependency order with no cycles.
+3. Confirm every PR is independently testable and has explicit non-goals.
+4. Confirm every task belongs to exactly one PR.
+5. Confirm all spec, implementation-plan, and test-plan paths are present.
+6. Search for placeholders, contradictions, missing rollback notes, and unowned test cases.
 
-**2. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
-
-**3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
-
-If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
+Fix issues inline before presenting the plan.
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice:
+After saving the documents, offer:
 
-**"Plan complete and saved to `docs/superplex/plans/<filename>.md`. Two execution options:**
+**"Plans complete and saved to `<implementation-plan>` and `<test-plan-or-N/A>`. Use subagent-driven-development to execute the PRs sequentially, or executing-plans for inline execution. Which approach?"**
 
-**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
-
-**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints
-
-**Which approach?"**
-
-**If Subagent-Driven chosen:**
-- **REQUIRED SUB-SKILL:** Use superplex:subagent-driven-development
-- Fresh subagent per task + two-stage review
-
-**If Inline Execution chosen:**
-- **REQUIRED SUB-SKILL:** Use superplex:executing-plans
-- Batch execution with checkpoints for review
+When execution begins, the controller must complete and merge the current PR review loop before starting a dependent PR.
