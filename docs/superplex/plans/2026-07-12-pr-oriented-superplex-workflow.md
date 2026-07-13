@@ -15,6 +15,7 @@
 - Tasks inside a PR are not review gates.
 - E2E may be deferred to a final dedicated PR.
 - Merge requires current-head sign-off, no eyes reaction, resolved feedback, and passing checks.
+- Branches and worktrees remain available through merge, post-merge validation, and all dependent/final PRs; cleanup is a separate finalization step.
 - New cloud secrets or variables block automatic merge until provisioned.
 
 ## PR Map

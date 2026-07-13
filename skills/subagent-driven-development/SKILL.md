@@ -27,7 +27,7 @@ Load implementation plan and test plan
        dispatch whole-PR reviewer
        start persistent PR feedback loop
        wait for checks, reactions, reviews, and resolved threads
-       squash-merge unless cloud secret/variable provisioning is required
+       squash-merge without deleting branch/worktree unless cloud secret/variable provisioning is required
   → start the next dependent PR only after merge
   → run final E2E/release PR last when the test plan defers it
 ```
@@ -88,7 +88,7 @@ When dispatching the whole-PR reviewer:
 
 The persistent feedback subagent owns valid and invalid PR comments. It must evaluate feedback against the code and linked documents, implement and test valid fixes, reply with evidence to invalid feedback, resolve addressed threads, and re-review after every push. It must monitor PR description reactions, review states, top-level comments, inline threads, required checks, and failed runs.
 
-An eyes reaction means review is still in progress. A thumbs-up is required for the current head SHA. Merge requires no eyes reaction, no pending or `CHANGES_REQUESTED` review, no unresolved actionable threads, no new feedback after the latest sweep, and all required checks passing. Squash-merge automatically unless new cloud secrets or variables must be provisioned; record that exception and resume from the PR ledger afterward.
+An eyes reaction means review is still in progress. A thumbs-up is required for the current head SHA. Merge requires no eyes reaction, no pending or `CHANGES_REQUESTED` review, no unresolved actionable threads, no new feedback after the latest sweep, and all required checks passing. Squash-merge automatically without deleting the branch or worktree unless new cloud secrets or variables must be provisioned; record that exception and resume from the PR ledger afterward. Preserve the branch, worktree, and ledgers through post-merge validation and all dependent/final PRs. Clean them up only in a separate finalization step after the complete task is done.
 
 ## Progress Ledger
 
@@ -110,3 +110,4 @@ Never:
 - Resolve a thread before its fix or technical response is visible.
 - Merge while an eyes reaction remains.
 - Claim the PR is complete from an unverified subagent report.
+- Delete a branch or worktree immediately after an individual PR merges.

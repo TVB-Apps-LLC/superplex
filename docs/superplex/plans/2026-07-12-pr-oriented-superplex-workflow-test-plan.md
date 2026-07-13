@@ -23,6 +23,8 @@ Verify that Superplex plans and executes dependency-ordered pull requests, creat
 | Stale thumbs-up is rejected | Push a new head after thumbs-up; sign-off must be renewed for the new SHA |
 | Failed checks block merge | Required check fails; feedback agent investigates and does not merge |
 | Fresh green state permits squash merge | Current-head thumbs-up, no eyes, no pending review, resolved threads, no new feedback, and green checks trigger squash merge |
+| Merge does not delete branch/worktree | Squash merge completes while the remote branch, local worktree, and ledgers remain available |
+| Cleanup waits for complete task | Branch/worktree cleanup is blocked until post-merge validation and all dependent/final PRs finish |
 | Cloud provisioning exception works | Add a required Vercel/GitHub/Trigger.dev secret; agent stops with a precise provisioning request |
 | Fourplex test traceability is preserved | Test plan maps cases to `tests/manifest/`, `pnpm test:cases:validate`, generated docs, and the final E2E PR |
 

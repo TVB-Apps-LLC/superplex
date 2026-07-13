@@ -125,7 +125,7 @@ The Pi package loads the Superplex skills and a small extension that injects the
 
 6. **requesting-code-review** - Activates after each PR. Reviews the full PR for spec compliance, code quality, and test coverage.
 
-7. **receiving-code-review** and **finishing-a-development-branch** - Process PR feedback, monitor reviews/reactions/checks, resolve threads, and squash-merge when the PR gate passes.
+7. **receiving-code-review** and **finishing-a-development-branch** - Process PR feedback, monitor reviews/reactions/checks, resolve threads, squash-merge when the PR gate passes, and retain branches/worktrees until the complete task is validated.
 
 **The agent checks for relevant skills before any task.** Mandatory workflows, not suggestions.
 

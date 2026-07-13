@@ -39,7 +39,7 @@ Use the repository's available GitHub integration or `gh` commands. Fourplex doc
 - A thumbs-up reaction is required for sign-off.
 - Sign-off applies only to the current head SHA. Any new push invalidates prior sign-off and requires a fresh review signal.
 - Merge is allowed only when the current head has thumbs-up sign-off, no eyes reaction, no pending review or `CHANGES_REQUESTED` state, no unresolved actionable threads, no new comments or reviews since the latest sweep, and all required checks pass.
-- When all gates pass, squash-merge automatically unless the PR requires new secrets or variables in Vercel, GitHub, Trigger.dev, or another cloud tool. Stop before merge for that provisioning exception and resume the same ledger afterward.
+- When all gates pass, squash-merge automatically without deleting the branch. Preserve the branch, worktree, and ledger until post-merge validation and the complete task/PR sequence are finished. Stop before merge if the PR requires new secrets or variables in Vercel, GitHub, Trigger.dev, or another cloud tool; resume the same ledger afterward.
 
 ## Common Mistakes
 

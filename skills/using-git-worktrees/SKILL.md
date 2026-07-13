@@ -52,7 +52,7 @@ Honor any existing declared preference without asking. If the user declines cons
 
 The user has asked for an isolated workspace (Step 0 consent). Do you already have a way to create a worktree? It might be a tool with a name like `EnterWorktree`, `WorktreeCreate`, a `/worktree` command, or a `--worktree` flag. If you do, use it and skip to Step 2.
 
-Native tools handle directory placement, branch creation, and cleanup automatically. Using `git worktree add` when you have a native tool creates phantom state your harness can't see or manage.
+Native tools handle directory placement and branch creation automatically. They may also offer cleanup, but do not request or accept cleanup while the associated PR, task, post-merge validation, or dependent PRs are active. Using `git worktree add` when you have a native tool creates phantom state your harness can't see or manage.
 
 Only proceed to Step 1b if you have no native worktree tool available.
 
@@ -128,6 +128,10 @@ npm test / cargo test / pytest / go test ./...
 ```
 
 **If tests fail:** Report failures, ask whether to proceed or investigate.
+
+## Step 4: Retain Until Complete
+
+Keep the branch and worktree available while implementation, review, PR feedback, checks, merge, post-merge validation, or dependent/final PRs remain. Do not use `--delete-branch`, `git branch -d`, `git push origin --delete`, `git worktree remove`, or harness teardown as part of an intermediate PR merge. Perform cleanup only after the controller records complete task/release validation, or after the user explicitly authorizes abandoning the entire task.
 
 **If tests pass:** Report ready.
 

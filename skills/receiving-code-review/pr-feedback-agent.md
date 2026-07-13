@@ -51,10 +51,13 @@ Subagent (general-purpose):
     - No new review/comment appeared after the last sweep.
     - All required checks pass and the PR is mergeable.
 
-    Squash-merge automatically when the gate passes. Stop before merge if
-    new Vercel, GitHub, Trigger.dev, or other cloud secrets/variables must be
-    provisioned. Report the exact provisioning request and resume from the
-    same ledger after it is complete.
+    Squash-merge automatically when the gate passes, without deleting the
+    remote branch. Keep the local worktree, branch, and ledger intact through
+    post-merge validation and any dependent or final E2E/release PRs. Cleanup
+    is a separate finalization step after the complete task is done. Stop
+    before merge if new Vercel, GitHub, Trigger.dev, or other cloud
+    secrets/variables must be provisioned. Report the exact provisioning
+    request and resume from the same ledger after it is complete.
 
     If permissions prevent reading, replying, resolving, checking, or
     merging, record the exact failed operation and return BLOCKED. Never claim

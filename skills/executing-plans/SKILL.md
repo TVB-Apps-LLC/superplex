@@ -28,7 +28,7 @@ For each PR in dependency order:
 4. Open or update the PR with the spec, implementation-plan, and test-plan paths.
 5. Use `requesting-code-review` for one whole-PR review covering spec compliance, code quality, and test coverage.
 6. Use `receiving-code-review` to delegate valid fixes, answer invalid feedback, resolve threads, monitor reactions and checks, and enforce the merge gate.
-7. Use `finishing-a-development-branch` to squash-merge after the gate passes, except when new cloud secrets or variables require provisioning.
+7. Use `finishing-a-development-branch` to squash-merge after the gate passes, without deleting the branch or worktree. Preserve both until the complete plan, post-merge validation, and any final E2E/release PRs are done, except when new cloud secrets or variables require provisioning.
 8. Start the next dependent PR only after the current PR merges.
 
 Tasks are execution units inside a PR. Do not create a separate review gate after every task.
@@ -36,6 +36,8 @@ Tasks are execution units inside a PR. Do not create a separate review gate afte
 ### Step 3: Final E2E and Release PR
 
 If the test plan defers E2E work, execute the final E2E/release-validation PR after production behavior is feature-complete. Update the test-case manifest, add or update Playwright coverage, regenerate generated documentation, and run the repository's release checks.
+
+Only after the final PR and all post-merge validation pass, record task completion and perform the separate branch/worktree cleanup step. Never treat an individual PR merge as permission to delete either.
 
 ## When to Stop
 
