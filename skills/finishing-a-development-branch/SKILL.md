@@ -1,241 +1,77 @@
 ---
 name: finishing-a-development-branch
-description: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work - guides completion of development work by presenting structured options for merge, PR, or cleanup
+description: Use when a pull request has completed its feedback loop and you need to verify merge readiness, merge it, or preserve or discard the branch
 ---
 
 # Finishing a Development Branch
 
-## Overview
+Finish a PR-oriented branch only after fresh verification of the current remote head, checks, reviews, reactions, and threads.
 
-Guide completion of development work by presenting clear options and handling chosen workflow.
+**Announce at start:** "I'm using the finishing-a-development-branch skill to complete this PR."
 
-**Core principle:** Verify tests → Detect environment → Present options → Execute choice → Clean up.
+## Merge Gate
 
-**Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
+Before merging, verify all of the following for the current head SHA:
 
-## The Process
+- The PR is open and mergeable.
+- Required checks pass.
+- The PR description has a current thumbs-up sign-off.
+- No eyes reaction remains.
+- No pending review or `CHANGES_REQUESTED` state remains.
+- Every actionable thread is fixed or technically answered and resolved.
+- No new comments or reviews appeared after the latest sweep.
+- The PR body links to the approved spec, implementation plan, and test plan.
 
-### Step 1: Verify Tests
+If any condition fails, return to `superplex:receiving-code-review`. Do not merge based on a local test run or a subagent report alone.
 
-**Before presenting options, verify tests pass:**
+## Automatic Merge Policy
 
-```bash
-# Run project's test suite
-npm test / cargo test / pytest / go test ./...
-```
-
-**If tests fail:**
-```
-Tests failing (<N> failures). Must fix before completing:
-
-[Show failures]
-
-Cannot proceed with merge/PR until tests pass.
-```
-
-Stop. Don't proceed to Step 2.
-
-**If tests pass:** Continue to Step 2.
-
-### Step 2: Detect Environment
-
-**Determine workspace state before presenting options:**
+When the merge gate passes, squash-merge automatically:
 
 ```bash
-GIT_DIR=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
-GIT_COMMON=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
+gh pr merge <pr-number> --squash
 ```
 
-This determines which menu to show and how cleanup works:
+Stop before merging if the PR requires new secrets or variables in Vercel, GitHub, Trigger.dev, or another cloud tool. Record the exact provisioning request and resume the same PR ledger after provisioning.
 
-| State | Menu | Cleanup |
-|-------|------|---------|
-| `GIT_DIR == GIT_COMMON` (normal repo) | Standard 4 options | No worktree to clean up |
-| `GIT_DIR != GIT_COMMON`, named branch | Standard 4 options | Provenance-based (see Step 6) |
-| `GIT_DIR != GIT_COMMON`, detached HEAD | Reduced 3 options (no merge) | No cleanup (externally managed) |
+If the repository explicitly prohibits automatic merging, preserve that repository guardrail and report the PR as merge-ready instead.
 
-### Step 3: Determine Base Branch
+After merging, verify the PR is closed and record the merge commit and timestamp in `.superplex/sdd/progress.md` and `.superplex/pr-review/<pr-number>.md`. Do not delete the remote branch or remove the local worktree here. The branch and worktree remain available for post-merge validation, dependent PRs, and any final E2E or release-validation PR.
 
-```bash
-# Try common base branches
-git merge-base HEAD main 2>/dev/null || git merge-base HEAD master 2>/dev/null
-```
+## No PR Yet
 
-Or ask: "This branch split from main - is that correct?"
+If the branch has not been pushed or a PR has not been opened:
 
-### Step 4: Present Options
+1. Push the feature branch.
+2. Open a PR targeting the plan's base branch.
+3. Include the spec, implementation-plan, and test-plan paths in the PR body.
+4. Start `superplex:requesting-code-review` and then `superplex:receiving-code-review`.
 
-**Normal repo and named-branch worktree — present exactly these 4 options:**
+Do not delete the worktree while the PR feedback loop is active.
 
-```
-Implementation complete. What would you like to do?
+## Cleanup
 
-1. Merge back to <base-branch> locally
-2. Push and create a Pull Request
-3. Keep the branch as-is (I'll handle it later)
-4. Discard this work
+Preserve the local and remote branch and its worktree through the complete task lifecycle. Cleanup is a separate finalization step after the PR is confirmed merged, post-merge validation passes, all dependent/final PRs are complete, and the controller records task completion in its progress and PR ledgers. Never pass `--delete-branch` as part of the merge command, and never remove a harness-owned worktree while the task or any related PR is active.
 
-Which option?
-```
-
-**Detached HEAD — present exactly these 3 options:**
-
-```
-Implementation complete. You're on a detached HEAD (externally managed workspace).
-
-1. Push as new branch and create a Pull Request
-2. Keep as-is (I'll handle it later)
-3. Discard this work
-
-Which option?
-```
-
-**Don't add explanation** - keep options concise.
-
-### Step 5: Execute Choice
-
-#### Option 1: Merge Locally
-
-```bash
-# Get main repo root for CWD safety
-MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
-cd "$MAIN_ROOT"
-
-# Merge first — verify success before removing anything
-git checkout <base-branch>
-git pull
-git merge <feature-branch>
-
-# Verify tests on merged result
-<test command>
-
-# Only after merge succeeds: cleanup worktree (Step 6), then delete branch
-```
-
-Then: Cleanup worktree (Step 6), then delete branch:
-
-```bash
-git branch -d <feature-branch>
-```
-
-#### Option 2: Push and Create PR
-
-```bash
-# Push branch
-git push -u origin <feature-branch>
-```
-
-**Do NOT clean up worktree** — user needs it alive to iterate on PR feedback.
-
-#### Option 3: Keep As-Is
-
-Report: "Keeping branch <name>. Worktree preserved at <path>."
-
-**Don't cleanup worktree.**
-
-#### Option 4: Discard
-
-**Confirm first:**
-```
-This will permanently delete:
-- Branch <name>
-- All commits: <commit-list>
-- Worktree at <path>
-
-Type 'discard' to confirm.
-```
-
-Wait for exact confirmation.
-
-If confirmed:
-```bash
-MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
-cd "$MAIN_ROOT"
-```
-
-Then: Cleanup worktree (Step 6), then force-delete branch:
-```bash
-git branch -D <feature-branch>
-```
-
-### Step 6: Cleanup Workspace
-
-**Only runs for Options 1 and 4.** Options 2 and 3 always preserve the worktree.
-
-```bash
-GIT_DIR=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
-GIT_COMMON=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
-WORKTREE_PATH=$(git rev-parse --show-toplevel)
-```
-
-**If `GIT_DIR == GIT_COMMON`:** Normal repo, no worktree to clean up. Done.
-
-**If worktree path is under `.worktrees/` or `worktrees/`:** Superplex created this worktree — we own cleanup.
-
-```bash
-MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
-cd "$MAIN_ROOT"
-git worktree remove "$WORKTREE_PATH"
-git worktree prune  # Self-healing: clean up any stale registrations
-```
-
-**Otherwise:** The host environment (harness) owns this workspace. Do NOT remove it. If your platform provides a workspace-exit tool, use it. Otherwise, leave the workspace in place.
+An explicitly user-authorized discard is an abort path, not normal cleanup. It must name the entire task/PR scope being abandoned before any branch or worktree is removed.
 
 ## Quick Reference
 
-| Option | Merge | Push | Keep Worktree | Cleanup Branch |
-|--------|-------|------|---------------|----------------|
-| 1. Merge locally | yes | - | - | yes |
-| 2. Create PR | - | yes | yes | - |
-| 3. Keep as-is | - | - | yes | - |
-| 4. Discard | - | - | - | yes (force) |
-
-## Common Mistakes
-
-**Skipping test verification**
-- **Problem:** Merge broken code, create failing PR
-- **Fix:** Always verify tests before offering options
-
-**Open-ended questions**
-- **Problem:** "What should I do next?" is ambiguous
-- **Fix:** Present exactly 4 structured options (or 3 for detached HEAD)
-
-**Cleaning up worktree for Option 2**
-- **Problem:** Remove worktree user needs for PR iteration
-- **Fix:** Only cleanup for Options 1 and 4
-
-**Deleting branch before removing worktree**
-- **Problem:** `git branch -d` fails because worktree still references the branch
-- **Fix:** Merge first, remove worktree, then delete branch
-
-**Running git worktree remove from inside the worktree**
-- **Problem:** Command fails silently when CWD is inside the worktree being removed
-- **Fix:** Always `cd` to main repo root before `git worktree remove`
-
-**Cleaning up harness-owned worktrees**
-- **Problem:** Removing a worktree the harness created causes phantom state
-- **Fix:** Only clean up worktrees under `.worktrees/` or `worktrees/`
-
-**No confirmation for discard**
-- **Problem:** Accidentally delete work
-- **Fix:** Require typed "discard" confirmation
+| State | Action |
+|---|---|
+| Checks, reviews, or threads incomplete | Continue receiving-code-review |
+| All gates pass | Squash-merge automatically; preserve branch/worktree |
+| New cloud secret/variable required | Stop and request provisioning |
+| Repository forbids auto-merge | Report merge-ready and stop |
+| Merge complete | Verify closure, record state, preserve branch/worktree, continue post-merge validation |
 
 ## Red Flags
 
-**Never:**
-- Proceed with failing tests
-- Merge without verifying tests on result
-- Delete work without confirmation
-- Force-push without explicit request
-- Remove a worktree before confirming merge success
-- Clean up worktrees you didn't create (provenance check)
-- Run `git worktree remove` from inside the worktree
+Never:
 
-**Always:**
-- Verify tests before offering options
-- Detect environment before presenting menu
-- Present exactly 4 options (or 3 for detached HEAD)
-- Get typed confirmation for Option 4
-- Clean up worktree for Options 1 & 4 only
-- `cd` to main repo root before worktree removal
-- Run `git worktree prune` after removal
+- Merge before fresh remote verification.
+- Accept a stale thumbs-up after a new push.
+- Merge while an eyes reaction or unresolved actionable thread remains.
+- Pass `--delete-branch` during merge.
+- Remove the branch or worktree when the PR is merged but the overall task, dependent PRs, or post-merge validation are incomplete.
+- Force-push or discard work without explicit authorization.

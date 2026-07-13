@@ -1,70 +1,52 @@
 ---
 name: executing-plans
-description: Use when you have a written implementation plan to execute in a separate session with review checkpoints
+description: Use when you have a written PR-oriented implementation plan to execute in a separate session with review checkpoints
 ---
 
 # Executing Plans
 
-## Overview
+Load the implementation and test plans, review them critically, and execute the PR map in dependency order. Use `subagent-driven-development` instead when subagents are available in the current session.
 
-Load plan, review critically, execute all tasks, report when complete.
+**Announce at start:** "I'm using the executing-plans skill to implement this PR-oriented plan."
 
-**Announce at start:** "I'm using the executing-plans skill to implement this plan."
+## Process
 
-**Note:** Tell your human partner that Superplex works much better with access to subagents. The quality of its work will be significantly higher if run on a platform with subagent support (Claude Code, Codex CLI, Codex App, and Copilot CLI all qualify; see the per-platform tool refs in `../using-superplex/references/`). If subagents are available, use superplex:subagent-driven-development instead of this skill.
+### Step 1: Load and Review Plans
 
-## The Process
+1. Read the implementation plan, test plan, approved spec, and repository instructions.
+2. Review the PR map for missing prerequisites, broken intermediate states, contradictory constraints, missing test ownership, or missing spec/plan links.
+3. If concerns block execution, raise them before starting.
+4. If the plan is sound, create progress entries for every PR and its tasks.
 
-### Step 1: Load and Review Plan
-1. Read plan file
-2. Review critically - identify any questions or concerns about the plan
-3. If concerns: Raise them with your human partner before starting
-4. If no concerns: Create todos for the plan items and proceed
+### Step 2: Execute One PR at a Time
 
-### Step 2: Execute Tasks
+For each PR in dependency order:
 
-For each task:
-1. Mark as in_progress
-2. Follow each step exactly (plan has bite-sized steps)
-3. Run verifications as specified
-4. Mark as completed
+1. Set up the required isolated workspace and branch.
+2. Execute its tasks in order, marking each task in progress and complete.
+3. Run the PR's test matrix and required verification.
+4. Open or update the PR with the spec, implementation-plan, and test-plan paths.
+5. Use `requesting-code-review` for one whole-PR review covering spec compliance, code quality, and test coverage.
+6. Use `receiving-code-review` to delegate valid fixes, answer invalid feedback, resolve threads, monitor reactions and checks, and enforce the merge gate.
+7. Use `finishing-a-development-branch` to squash-merge after the gate passes, without deleting the branch or worktree. Preserve both until the complete plan, post-merge validation, and any final E2E/release PRs are done, except when new cloud secrets or variables require provisioning.
+8. Start the next dependent PR only after the current PR merges.
 
-### Step 3: Complete Development
+Tasks are execution units inside a PR. Do not create a separate review gate after every task.
 
-After all tasks complete and verified:
-- Announce: "I'm using the finishing-a-development-branch skill to complete this work."
-- **REQUIRED SUB-SKILL:** Use superplex:finishing-a-development-branch
-- Follow that skill to verify tests, present options, execute choice
+### Step 3: Final E2E and Release PR
 
-## When to Stop and Ask for Help
+If the test plan defers E2E work, execute the final E2E/release-validation PR after production behavior is feature-complete. Update the test-case manifest, add or update Playwright coverage, regenerate generated documentation, and run the repository's release checks.
 
-**STOP executing immediately when:**
-- Hit a blocker (missing dependency, test fails, instruction unclear)
-- Plan has critical gaps preventing starting
-- You don't understand an instruction
-- Verification fails repeatedly
+Only after the final PR and all post-merge validation pass, record task completion and perform the separate branch/worktree cleanup step. Never treat an individual PR merge as permission to delete either.
 
-**Ask for clarification rather than guessing.**
+## When to Stop
 
-## When to Revisit Earlier Steps
-
-**Return to Review (Step 1) when:**
-- Partner updates the plan based on your feedback
-- Fundamental approach needs rethinking
-
-**Don't force through blockers** - stop and ask.
-
-## Remember
-- Review plan critically first
-- Follow plan steps exactly
-- Don't skip verifications
-- Reference skills when plan says to
-- Stop when blocked, don't guess
-- Never start implementation on main/master branch without explicit user consent
+Stop immediately when a required check fails, a plan prerequisite is missing, a review comment is ambiguous, a required GitHub permission is unavailable, or a cloud secret/variable must be provisioned. Record the blocker and ask for direction rather than guessing.
 
 ## Integration
 
-**Required workflow skills:**
-- **superplex:using-git-worktrees** - Ensures isolated workspace (creates one or verifies existing)
-- **superplex:writing-plans** - Creates the plan this skill executes
-- **superplex:finishing-a-development-branch** - Complete development after all tasks
+- `superplex:using-git-worktrees` — workspace isolation and baseline verification.
+- `superplex:writing-plans` — creates the PR map and test plan.
+- `superplex:requesting-code-review` — whole-PR review.
+- `superplex:receiving-code-review` — persistent PR feedback loop.
+- `superplex:finishing-a-development-branch` — merge gate and cleanup.

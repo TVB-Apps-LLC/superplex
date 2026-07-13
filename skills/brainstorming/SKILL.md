@@ -10,6 +10,20 @@ Help turn ideas into fully formed designs and specs through natural collaborativ
 Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design and get user approval.
 
 <HARD-GATE>
+Before sending any question, verify that it includes `**Recommendation:**` with a concrete option, answer, or default and a concise reason. A question without that field is incomplete and must not be sent.
+</HARD-GATE>
+
+## Subagent Model Selection
+
+If brainstorming requires sub-agents for repository exploration, simple research, or mechanical context gathering, use the least expensive capable model and specify it explicitly:
+
+- Claude: Sonnet.
+- Codex: Luna.
+- Cursor: Composer 2.5.
+
+Reserve frontier models for complex implementation design, architecture, advanced review, or research requiring frontier knowledge. Do not spend a frontier model on straightforward file discovery, routine documentation lookup, or mechanical synthesis.
+
+<HARD-GATE>
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
 </HARD-GATE>
 
@@ -23,13 +37,27 @@ You MUST create a task for each of these items and complete them in order:
 
 1. **Explore project context** — check files, docs, recent commits
 2. **Offer the visual companion just-in-time** — NOT upfront. The first time a question would genuinely be clearer shown than described, offer it then (its own message); on approval its browser tab opens for you. If no visual question ever arises, never offer it. See the Visual Companion section below.
-3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
+3. **Ask clarifying questions** — one at a time, using the required Question Contract: question + recommendation + reason
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
 6. **Write design doc** — save to `docs/superplex/specs/YYYY-MM-DD-<topic>-design.md` and commit
 7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 8. **User reviews written spec** — ask user to review the spec file before proceeding
 9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+
+## Question Contract
+
+Every question must state the agent's recommendation and why. This applies to clarification questions, multiple-choice decisions, open-ended prompts, design-section approval checks, and the visual-companion offer.
+
+Use this shape:
+
+```markdown
+**Question:** [one decision or answer]
+
+**Recommendation:** [option, proposed answer, or default] — [brief reason grounded in the user's stated goals, constraints, or repository context]
+```
+
+For multiple-choice questions, name the recommended option explicitly (for example, `Recommendation: B — ...`). For open-ended questions, propose a concrete default answer or working assumption and explain why; the user can override it. If the available context is insufficient for a strong recommendation, recommend the most reversible default and say why it is reversible. Never ask the user to choose without giving a recommendation.
 
 ## Process Flow
 
@@ -70,6 +98,7 @@ digraph brainstorming {
 - For appropriately-scoped projects, ask questions one at a time to refine the idea
 - Prefer multiple choice questions when possible, but open-ended is fine too
 - Only one question per message - if a topic needs more exploration, break it into multiple questions
+- Every question includes the recommended answer or option and a concise reason
 - Focus on understanding: purpose, constraints, success criteria
 
 **Exploring approaches:**
@@ -82,7 +111,7 @@ digraph brainstorming {
 
 - Once you believe you understand what you're building, present the design
 - Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
-- Ask after each section whether it looks right so far
+- Ask after each section whether it looks right so far, with a recommendation to approve, revise, or decide the next point and why
 - Cover: architecture, components, data flow, error handling, testing
 - Be ready to go back and clarify if something doesn't make sense
 
@@ -121,7 +150,7 @@ Fix any issues inline. No need to re-review — just fix and move on.
 **User Review Gate:**
 After the spec review loop passes, ask the user to review the written spec before proceeding:
 
-> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
+> "Spec written and committed to `<path>`. **Recommendation:** approve it as written because it incorporates the decisions confirmed so far. Please review it and let me know if you want any changes before we start writing the implementation plan."
 
 Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
 
@@ -134,6 +163,7 @@ Wait for the user's response. If they request changes, make them and re-run the 
 
 - **One question at a time** - Don't overwhelm with multiple questions
 - **Multiple choice preferred** - Easier to answer than open-ended when possible
+- **Recommendation on every question** - Name the recommended option or default and why
 - **YAGNI ruthlessly** - Remove unnecessary features from all designs
 - **Explore alternatives** - Always propose 2-3 approaches before settling
 - **Incremental validation** - Present design, get approval before moving on
@@ -144,7 +174,7 @@ Wait for the user's response. If they request changes, make them and re-run the 
 A browser-based companion for showing mockups, diagrams, and visual options during brainstorming. Available as a tool — not a mode. Accepting the companion means it's available for questions that benefit from visual treatment; it does NOT mean every question goes through the browser.
 
 **Offering the companion (just-in-time):** Do NOT offer it upfront. Wait until a question would genuinely be clearer shown than told — a real mockup / layout / diagram question, not merely a UI *topic*. The first time that happens, offer it then, as its own message:
-> "This next part might be easier if I show you — I can put together mockups, diagrams, and comparisons in a browser tab as we go. It's still new and can be token-intensive. Want me to? I'll open it for you."
+> "This next part might be easier if I show you — I can put together mockups, diagrams, and comparisons in a browser tab as we go. It's still new and can be token-intensive. Want me to? **Recommendation:** yes — this is a visual decision, so seeing the alternatives should make the choice faster and clearer. I'll open it for you."
 
 **This offer MUST be its own message.** Only the offer — no clarifying question, summary, or other content. Wait for the user's response. If they accept, start the server with `--open` so their browser opens to the first screen automatically. If they decline, continue text-only and don't offer again unless they raise it.
 

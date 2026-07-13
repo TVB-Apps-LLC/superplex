@@ -19,6 +19,17 @@ Subagent (general-purpose):
 
     [Scene-setting: where this fits, dependencies, architectural context]
 
+    ## PR Context
+
+    PR: [PR_URL_OR_PENDING]
+    Spec: [SPEC_PATH]
+    Implementation plan: [IMPLEMENTATION_PLAN_PATH]
+    Test plan: [TEST_PLAN_PATH_OR_NA]
+    PR entry: [PR_ENTRY]
+
+    Work only within this task's ownership inside the named PR. Do not pull
+    unrelated future-PR work into this task.
+
     ## Before You Begin
 
     If you have questions about:
